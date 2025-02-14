@@ -13,7 +13,7 @@ import (
 )
 
 // HandlerFunc is a function that handles MQTT messages.
-type HandlerFunc func(payload []byte) error
+type HandlerFunc func(msg mqtt.Message) error
 
 // BuildCustomTopic is a function that builds a custom topic.
 type BuildCustomTopic func(subTopic string) string
@@ -130,7 +130,7 @@ func (mc *Client) buildTopic(subTopic string, vaultID int) string {
 func (mc *Client) Subscribe(topic string, callback HandlerFunc) error {
 	token := mc.client.Subscribe(topic, 1, func(_ mqtt.Client, msg mqtt.Message) {
 		mc.logger.Info("Message received on topic %s", msg.Topic())
-		if err := callback(msg.Payload()); err != nil {
+		if err := callback(msg); err != nil {
 			mc.logger.Error("Failed to handle mqtt message: %v", err)
 		}
 	})
