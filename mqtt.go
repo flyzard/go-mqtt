@@ -225,3 +225,14 @@ func (c *Client) Disconnect() {
 	c.mqttClient.Disconnect(250)
 	c.logger.Info("Disconnected.")
 }
+
+// StartSubscribing subscribes the MQTTClient to the topics and starts the handlers.
+func (c *Client) StartSubscribing() error {
+	for topic, handlerFunc := range c.handlers {
+		if err := c.Subscribe(topic, handlerFunc); err != nil {
+			return fmt.Errorf("failed to subscribe to topic %s: %w", topic, err)
+		}
+	}
+
+	return nil
+}
