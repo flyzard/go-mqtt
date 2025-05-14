@@ -12,19 +12,8 @@ import (
 	"github.com/google/uuid"
 )
 
-// Message represents an MQTT message.
-type Message interface {
-	Duplicate() bool
-	Qos() byte
-	Retained() bool
-	Topic() string
-	MessageID() uint16
-	Payload() []byte
-	Ack()
-}
-
 // HandlerFunc is a function that handles MQTT messages.
-type HandlerFunc func(msg Message) error
+type HandlerFunc func(msg mqtt.Message) error
 
 // BuildCustomTopic is a function that builds a custom topic.
 type BuildCustomTopic func(subTopic string) string
@@ -130,6 +119,11 @@ func (mc *Client) Publish(topic string, msg any, qos byte, retained bool) error 
 
 	mc.logger.Info("Message on topic %s published", fullTopic)
 	return nil
+}
+
+// buildTopic builds the full topic for the given sub-topic.
+func (mc *Client) buildTopic(subTopic string, vaultID int) string {
+	return fmt.Sprintf("vault/%d/%s", vaultID, subTopic)
 }
 
 // Subscribe subscribes to a topic with a given message handler.
